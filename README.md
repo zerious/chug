@@ -230,10 +230,10 @@ assets so their IDs and classes will match.
 
 ### enableUse
 
-Chug's "@use" functionality is an alternative to common JS
+Chug's `@<b></b>use` functionality is an alternative to common JS
 require statements. When `enableUse` is set to true, assets
-will be searched for @use annotations inside comments. The
-@use annotations serve as guidance for asset ordering within
+will be searched for `@<b></b>use` annotations inside comments. The
+`@<b></b>use` annotations serve as guidance for asset ordering within
 loads, and they also load assets that were referenced but
 didn't yet exist in the load. Paths can be specified with
 leading "./" for the current directory, or "../" to back up
@@ -247,7 +247,7 @@ We would like to thank all of the amazing people who use, support,
 promote, enhance, document, patch, and submit comments & issues.
 Chug couldn't exist without you.
 
-Additionally, huge thanks go to [TUNE](http://www.tune.com) for employing
+Additionally, huge thanks go to [Goin’](https://goin.io) for employing
 and supporting [Chug](http://lighter.io/chug) project maintainers,
 and for being an epically awesome place to work (and play).
 
