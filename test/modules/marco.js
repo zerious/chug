@@ -1,2 +1,2 @@
-exports.name = 'marco';
-global.marco = 'polo';
+exports.name = 'marco'
+global.marco = 'polo'

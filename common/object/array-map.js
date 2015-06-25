@@ -6,34 +6,33 @@
  * @import object/type
  */
 
-module.exports = ArrayMap;
+module.exports = ArrayMap
 
-function ArrayMap() {
-  var map = [];
-  map.set = set;
-  map.get = get;
-  map.remove = remove;
-  return map;
+function ArrayMap () {
+  var map = []
+  map.set = set
+  map.get = get
+  map.remove = remove
+  return map
 }
 
-function set(key, value) {
-  var self = this;
-  var found = self[key];
+function set (key, value) {
+  var self = this
+  var found = self[key]
   if (found === undefined) {
-    self.push(value);
+    self.push(value)
+  } else {
+    self.remove(key)
   }
-  else {
-    self.remove(key);
-  }
-  self[key] = value;
+  self[key] = value
 }
 
-function get(key) {
-  var self = this;
-  return self[key];
+function get (key) {
+  var self = this
+  return self[key]
 }
 
-function remove(key) {
-  var self = this;
-  return self[key];
+function remove (key) {
+  var self = this
+  return self[key]
 }

@@ -8,10 +8,10 @@
  * @import object/type
  */
 
-var fs = require('fs');
-var mkdirp = require('../../common/fs/mkdirp');
-var Type = require('../../common/object/type');
-var dirname = require('path').dirname;
+var fs = require('fs')
+var mkdirp = require('../../common/fs/mkdirp')
+var Type = require('../../common/object/type')
+var dirname = require('path').dirname
 
 /**
  * A DotCache object allows cache directories and files to be written.
@@ -34,9 +34,9 @@ var DotCache = module.exports = Type.extend({
    * @param  {Object} options  Overrides for properties like "log" and "dir".
    */
   init: function (options) {
-    var self = this;
-    Type.decorate(self, options);
-    self.dir = self.dir.replace(/[\/\\]?$/, '/');
+    var self = this
+    Type.decorate(self, options)
+    self.dir = self.dir.replace(/[\/\\]?$/, '/')
   },
 
   /**
@@ -48,40 +48,37 @@ var DotCache = module.exports = Type.extend({
    * @param  {Function}      fn         A function to call on error or success.
    */
   write: function (name, path, content, fn) {
-    var self = this;
-    path = self.dir + name + path.replace(/^[\.\/\\]*/, '/');
-    if (typeof content != 'string' && !(content instanceof Buffer)) {
-      content = content.toString();
+    var self = this
+    path = self.dir + name + path.replace(/^[\.\/\\]*/, '/')
+    if (typeof content !== 'string' && !(content instanceof Buffer)) {
+      content = content.toString()
     }
 
-    var dir = dirname(path);
+    var dir = dirname(path)
     mkdirp(dir, function (error) {
       if (error) {
         if (fn) {
-          fn(error);
+          fn(error)
+        } else {
+          self.log.error(error)
         }
-        else {
-          self.log.error(error);
-        }
-      }
-      else {
+      } else {
         fs.writeFile(path, content, function (error) {
           if (fn) {
-            fn(error, path);
+            fn(error, path)
+          } else if (error) {
+            self.log.error(error)
           }
-          else if (error) {
-            self.log.error(error);
-          }
-        });
+        })
       }
-    });
+    })
 
   }
 
-});
+})
 
 // Make a base cacher with default options.
-DotCache.default = new DotCache();
+DotCache.default = new DotCache()
 
 /**
  * Export a factory function for creating new cachers.
@@ -89,5 +86,5 @@ DotCache.default = new DotCache();
  * @return {DotCache}          The new (or existing) cacher.
  */
 DotCache.create = function (options) {
-  return options ? new DotCache(options) : DotCache.default;
-};
+  return options ? new DotCache(options) : DotCache.default
+}
