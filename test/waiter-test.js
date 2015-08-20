@@ -4,113 +4,81 @@ var is = global.is || require('exam/lib/is')
 
 describe('Waiter', function () {
   before(function () {
-    chug.waitCount = 0
-    chug.isReady = false
-    chug.onceReadyQueue = []
-    chug.onReadyQueue = []
+    chug.waits = 0
+    chug.finished = false
+    chug.thenQueue = []
+    chug.queue = []
   })
   describe('wait/unwait', function() {
     it('should increment/decrement', function () {
       var w = new Waiter()
       w.wait()
-      is(w.waitCount, 1)
-      is(w.isReady, false)
+      is(w.waits, 1)
+      is(w.getFlag('finished'), false)
       w.wait()
-      is(w.waitCount, 2)
+      is(w.waits, 2)
       w.unwait()
-      is(w.waitCount, 1)
-      is(w.isReady, false)
+      is(w.waits, 1)
+      is(w.getFlag('finished'), false)
       w.unwait()
-      is(w.waitCount, 0)
-      is(w.isReady, true)
-      w.isReady = false
+      is(w.waits, 0)
+      is(w.getFlag('finished'), true)
+      w.setFlag('finished', false)
     })
   })
-  describe('onceReady', function() {
+  describe('then', function() {
     var w = new Waiter()
     it('should have a method', function () {
-      is.function(w.onceReady)
+      is.function(w.then)
     })
     it('should have a queue', function () {
-      is.object(w.onceReadyQueue)
-      w.onceReady(function() { })
-      is(w.onceReadyQueue.length, 1)
+      is.array(w.queue)
+      w.then(function() { })
+      is(w.queue.length, 1)
     })
     it('should execute callbacks', function () {
       var calls = 0
-      var callback = function () {
+      var fn1 = function () {
         calls++
       }
-      // A call isn't made initially because isReady === false.
-      w.onceReady(callback)
-      is(calls, 0)
+      var fn2 = function () {
+        calls++
+      }
+      var fn3 = function () {
+        calls++
+      }
+      // If nothing is waiting, the callback should execute.
+      w.then(fn1)
+      is(calls, 1)
 
-      // Starting an async call doesn't cause a call to execute.
+      // When waiting, a call will not execute.
       w.wait()
-      is(calls, 0)
-
-      // Async calls are in progress, so callbacks won't execute.
-      w.onceReady(callback)
-      is(calls, 0)
+      is(calls, 1)
+      w.then(fn2)
+      is(calls, 1)
 
       // Once async calls finish, callbacks will execute.
       w.unwait()
       is(calls, 2)
 
-      // Initial load is completed, so callbacks execute immediately.
-      w.onceReady(callback)
+      // Initial load is completed, so callbacks execute immediately again.
+      w.then(fn3)
+      is(calls, 3)
+
+      // When the waiter becomes ready again, nothing should re-execute.
+      w.wait()
+      w.unwait()
       is(calls, 3)
     })
   })
-  describe('onReady', function() {
-    var w = new Waiter()
-    it('should have a method', function () {
-      is.function(w.onReady)
-    })
-    it('should have a queue', function () {
-      is.object(w.onReadyQueue)
-      w.onReady(function() { })
-      is(w.onReadyQueue.length, 1)
-    })
-    it('should execute callbacks', function () {
-      var calls = 0
-      var callback = function () {
-        calls++
-      }
-      // A call isn't made initially because isReady === false.
-      w.onReady(callback)
-      is(calls, 0)
-
-      // Starting an async call doesn't cause a call to execute.
-      w.wait()
-      is(calls, 0)
-
-      // Async calls are in progress, so callbacks won't execute.
-      w.onReady(callback)
-      is(calls, 0)
-
-      // Once async calls finish, callbacks will execute.
-      w.unwait()
-      is(calls, 2)
-
-      // Initial load is completed, so callbacks execute immediately.
-      w.onReady(callback)
-      is(calls, 3)
-
-      // When the waiter becomes ready again, everything should re-execute.
-      w.wait()
-      w.unwait()
-      is(calls, 6)
-    })
-  })
-  describe('addParent', function() {
+  describe('parent', function() {
     it('should link wait counts', function (done) {
       var parent = new Waiter()
       var child = new Waiter()
       child.wait(2)
-      child.addParent(parent)
-      is(parent.waitCount, 2)
-      parent.onceReady(done)
+      child.parent(parent)
+      is(parent.waits, 2)
+      parent.then(done)
       child.unwait(2)
     })
   })

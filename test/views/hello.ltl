@@ -1,5 +1,5 @@
-call base/page
-    set title:
-        Hello World!
-    set content:
-        p._content This is a test.
+@base/page
+  set title:
+    Hello World!
+  set content:
+    p._content This is a test.

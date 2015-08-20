@@ -120,7 +120,7 @@ describe('Asset', function () {
     is(asset.minifiedContent, '.a{width:2}')
   })
 
-  it('should compile and minify scss', function () {
+  it.skip('should compile and minify scss', function () {
     var asset = new Asset('hi.scss')
     asset.setContent('$white: #fff;\n.a{color: $white}').compile().minify()
     is(asset.minifiedContent, '.a{color:#fff}')
@@ -169,7 +169,8 @@ describe('Asset', function () {
     }
     chug.enableShrinking()
     chug.shrinker.reset()
-    chug('test/scripts/c.coffee')
+    var load = chug('test/scripts/c.coffee')
+    load
       .each(function (asset) {
         verifyContents(asset, "c = '_CC'\nc = '_CC'\nc = '_CC'\n")
       })

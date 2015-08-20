@@ -53,7 +53,7 @@ describe('Load', function () {
 
   it('should load views', function (done) {
     var views = chug('test/views')
-    views.onceReady(function () {
+    views.then(function () {
       is(views.assets.length, 2)
       var hasCachedItems = false
 
@@ -80,7 +80,7 @@ describe('Load', function () {
 
   it('should load views as an array', function (done) {
     var views = chug(['test/views/hello.ltl', 'test/views/base/page.ltl'])
-    views.onceReady(function () {
+    views.then(function () {
       is(views.assets.length, 2)
       done()
     })
@@ -141,7 +141,6 @@ describe('Load', function () {
       .then(function () {
         is(count, 2)
         is(this.assets.length, 2)
-        is(this.watchablePaths.length, 2)
         done()
       })
   })
@@ -220,14 +219,7 @@ describe('Load', function () {
           response.on('data', function (chunk) {
             var data = '' + chunk
             is.in(data, /var a;/)
-            http.get('http://127.0.0.1:8999/core.js?v=1234', function (response) {
-              response.on('data', function (chunk) {
-                var data = '' + chunk
-                is.in(data, /var a;/)
-                is.defined(response.headers.expires)
-                done()
-              })
-            })
+            done()
           })
         })
       })
@@ -270,151 +262,68 @@ describe('Load', function () {
       })
   })
 
-  it('should compress when routing with Za', function (done) {
-    var za = require('za')()
-    var decorations = require.resolve('za/lib/response')
-    delete require.cache[decorations]
-    require(decorations)
-    za.log = {info: function () {}}
-    za.listen(8998)
-    chug('test/scripts/b.js')
-      .minify()
-      .gzip()
-      .then(function () {
-        chug.setServer(za)
-      })
-      .route()
-      .then(function () {
-        http.get({
-          hostname: '127.0.0.1',
-          port: 8998,
-          path: '/test/scripts/b.js',
-          method: 'GET',
-          headers: {'accept-encoding': 'gzip'}
-        }, function (response) {
-          response.on('data', function (chunk) {
-            zlib.gunzip(chunk, function (err, data) {
-              is('' + data, 'var b=2;')
+  describe('with Za', function () {
+
+    it('should compress when routing', function (done) {
+      var za = require('za')()
+      var decorations = require.resolve('za/lib/response')
+      delete require.cache[decorations]
+      require(decorations)
+      za.log = {info: function () {}}
+      za.listen(8998)
+      chug('test/scripts/b.js')
+        .minify()
+        .gzip()
+        .then(function () {
+          chug.setServer(za)
+        })
+        .route()
+        .then(function () {
+          http.get({
+            hostname: '127.0.0.1',
+            port: 8998,
+            path: '/test/scripts/b.js',
+            method: 'GET',
+            headers: {'accept-encoding': 'gzip'}
+          }, function (response) {
+            response.on('data', function (chunk) {
+              zlib.gunzip(chunk, function (err, data) {
+                is('' + data, 'var b=2;')
+                za.close()
+                delete http.ServerResponse.prototype.zip
+                done()
+              })
+            })
+          })
+        })
+    })
+
+    it('should set an expires header when queried with a version', function (done) {
+      var za = require('za')()
+      var decorations = require.resolve('za/lib/response')
+      delete require.cache[decorations]
+      require(decorations)
+      za.log = {info: function () {}}
+      za.listen(8997)
+      chug('test/scripts/b.js')
+        .then(function () {
+          chug.setServer(za)
+        })
+        .route('/b.js')
+        .then(function () {
+          http.get('http://127.0.0.1:8997/b.js?v=1234', function (response) {
+            response.on('data', function (chunk) {
+              var data = '' + chunk
+              is.in(data, /var b/)
+              is.defined(response.headers.expires)
               za.close()
               delete http.ServerResponse.prototype.zip
               done()
             })
           })
         })
-      })
-  })
-
-  it('should watch a directory', function (done) {
-    var hasWritten = false
-    var hasUnlinked = false
-    var isDone = false
-    chug.setServer(express)
-    var cacheBust = chug.server.cacheBust
-    fs.mkdir('test/watch', function (err) {
-      var load = chug('test/watch')
-        .watch(function () {
-          chug.server = null
-
-          if (!hasWritten && (load.assets.length > 0)) {
-            hasWritten = true
-            fs.unlink('test/watch/a.txt')
-          } else if (!hasUnlinked && (load.assets.length < 1)) {
-            hasUnlinked = true
-            fs.rmdir('test/watch', function () {
-              if (!isDone) {
-                isDone = true
-                done()
-              }
-            })
-          }
-        })
-        .then(function () {
-          this.replayableActions = []
-          fs.writeFile('test/watch/a.txt', 'A')
-        })
     })
-  })
 
-  it('should watch views', function (done) {
-    fs.unlink('test/views/DELETE_ME.ltl', function () {
-      var concatCalls = 0
-      var load = chug('test/views')
-      var concat = load.concat().then(function () {
-        concat.assets[0].setContent = function () {
-          if (++concatCalls === 2) {
-            load.replayableActions = []
-            concat.replayableActions = []
-            done()
-          }
-        }
-      })
-      load.watch(function () {
-        fs.unlink('test/views/DELETE_ME.ltl', function () {})
-      })
-      load.then(function () {
-        fs.writeFile('test/views/DELETE_ME.ltl', 'b boom', function () {})
-      })
-    })
-  })
-
-  it('should watch scripts', function (done) {
-    var isDone = false
-    chug('test/scripts')
-      .watch()
-      .watch(function () {
-        if (!isDone) {
-          is(this.assets.length, 3)
-          isDone = true
-          done()
-        }
-      })
-      .then(function () {
-        this.replayableActions = []
-        var asset = this.assets[0]
-        fs.writeFile(asset.location, asset.content)
-      })
-  })
-
-  it('should ignore JetBrains backup files', function (done) {
-    var isDone = false
-    fs.mkdir('test/empty', function () {
-      var called = false
-      chug('test/empty')
-        .watch(function () {
-          called = true
-        })
-        .then(function () {
-          fs.watch('test/empty', function () {
-              fs.unlink('test/empty/___bak__', function () {
-                is(called, false)
-                fs.rmdir('test/empty', function () {
-                  if (!isDone) {
-                    isDone = true
-                    done()
-                  }
-                })
-              })
-          })
-          fs.writeFile('test/empty/___bak___', 'TEST')
-        })
-    })
-  })
-
-  it('should watch a single file', function (done) {
-    var load = chug(['test/scripts/a.coffee', 'test/scripts/b.js'])
-    var changed = ''
-    load
-      .minify()
-      .watch(function (file, event) {
-        is(file.substr(-4, 4), 'b.js')
-        if (done) {
-          done()
-          done = null
-        }
-      })
-      .onceReady(function () {
-        fs.writeFile('test/scripts/b.js', 'var b = 2;', function () {})
-      })
   })
 
   it('should wrap js but not css', function (done) {

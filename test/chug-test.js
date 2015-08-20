@@ -3,9 +3,9 @@ var is = global.is || require('exam/lib/is')
 
 describe('API', function () {
   before(function () {
-    chug.waitCount = 0
-    chug.isReady = false
-    chug.onceReadyQueue = []
+    chug.waits = 0
+    chug.finished = false
+    chug.thenQueue = []
   })
   it('should be a function', function () {
     is.function(chug)

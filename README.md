@@ -36,7 +36,6 @@ chug.setServer(server);
 
 chug(['node_modules/jquery/dist/jquery.js', 'scripts'])
   .compile()
-  .watch()
   .concat()
   .route('/all.js');
 ```
@@ -84,12 +83,6 @@ Runs `gzip` on each asset, using `each`.
 Replaces the contents of each asset using
 `string.replace(pattern, replacement)`. This includes base, compiled,
 minified, shrunken and gzipped contents.
-
-### .watch()
-Puts a `fs.watch` on the files and directories that were added to the `Load`.
-When changes occur, the affected assets are reloaded, then the load re-runs its
-chain of actions. Additionally, the location of the most recently modified
-asset is stored in `chug.changedLocation`.
 
 ### .require()
 Loads each asset as a Node.js module.

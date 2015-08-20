@@ -9,7 +9,7 @@ var chug = module.exports = function (location) {
 }
 
 /**
- * Turn the API into a waiter so we can bind onReady tasks to it.
+ * Turn the API into a waiter so we can bind then tasks to it.
  */
 var waiter = new Waiter()
 for (var property in waiter) {
@@ -38,7 +38,7 @@ chug._ignorePattern = /^(\.+)(|DS_Store|gitignore)$/
  * Cache all assets so each one only needs to be loaded once.
  */
 chug.cache = new Cache()
-chug.onReady(function () {
+chug.then(function () {
   chug.cache.write()
 })
 
