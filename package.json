@@ -1,6 +1,6 @@
 {
   "name": "chug",
-  "version": "1.0.0",
+  "version": "0.4.0",
   "description": "The caching build system",
   "dependencies": {
     "csso": "1.3.11",
@@ -12,15 +12,15 @@
   "devDependencies": {
     "clean-css": "3.0.7",
     "coffee-script": "1.8.0",
-    "exam": "git+https://github.com/zerious/exam.git",
+    "exam": "0.3.0",
     "express": "4.11.1",
     "less": "2.2.0",
-    "ltl": "git+https://github.com/zerious/ltl.git",
+    "ltl": "0.2.0",
     "markdown": "0.5.0",
     "node-sass": "3.2.0",
     "stylus": "0.49.3",
     "webpack": "1.5.3",
-    "za": "git+https://github.com/zerious/za.git"
+    "za": "0.2.0"
   },
   "keywords": [
     "cache",
