@@ -1,12 +1,13 @@
+/* global describe it */
+
 var chug = require('../chug')
 var Asset = require('../lib/asset')
-var is = global.is || require('exam/lib/is')
-var mock = global.mock || require('exam/lib/mock')
+var is = global.is || require('exam-is')
+var mock = global.mock || require('exam-mock')
 
 chug.setServer(require('express')())
 
 describe('Asset', function () {
-
   it('should should have a location', function () {
     var asset = new Asset('hi.ltl')
     is(asset.location, 'hi.ltl')
@@ -118,12 +119,6 @@ describe('Asset', function () {
     var asset = new Asset('hi.less')
     asset.setContent('.a { width: (1 + 1) }').compile().minify()
     is(asset.minifiedContent, '.a{width:2}')
-  })
-
-  it.skip('should compile and minify scss', function () {
-    var asset = new Asset('hi.scss')
-    asset.setContent('$white: #fff;\n.a{color: $white}').compile().minify()
-    is(asset.minifiedContent, '.a{color:#fff}')
   })
 
   it('should compile and minify stylus', function () {
@@ -266,5 +261,4 @@ describe('Asset', function () {
       asset.replace(/test/, 'gzip')
     })
   })
-
 })

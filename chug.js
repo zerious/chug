@@ -1,5 +1,5 @@
-var Waiter = require(__dirname + '/lib/waiter')
-var Cache = require(__dirname + '/lib/cache')
+var Cache = require('lighter-lru-cache')
+var Flagger = require('lighter-flagger')
 
 /**
  * Expose a function that creates a new "Load" of files.
@@ -8,24 +8,24 @@ var chug = module.exports = function (location) {
   return new Load(location, chug)
 }
 
-/**
- * Turn the API into a waiter so we can bind then tasks to it.
- */
-var waiter = new Waiter()
-for (var property in waiter) {
-  Object.defineProperty(chug, property, {
-    enumerable: false,
-    writable: true
-  })
-  chug[property] = waiter[property]
-}
+// Turn the API into a Flagger so we can bind ready tasks to it.
+Flagger.init(chug)
+
+var Asset = require('./lib/asset')
+var File = require('./lib/file')
+var Load = require('./lib/load')
+
+// Expose several Types as part of chug's API.
+chug.Load = Load
+chug.Asset = Asset
+chug.File = File
 
 /**
  * Expose the Chug version via package.json lazy loading.
  */
 Object.defineProperty(chug, 'version', {
   get: function () {
-    return require(__dirname + '/package.json').version
+    return require('./package').version
   }
 })
 
@@ -38,9 +38,6 @@ chug._ignorePattern = /^(\.+)(|DS_Store|gitignore)$/
  * Cache all assets so each one only needs to be loaded once.
  */
 chug.cache = new Cache()
-chug.then(function () {
-  chug.cache.write()
-})
 
 /**
  * Express or similar server with server.get(path, callback) routing.
@@ -72,7 +69,7 @@ chug.setLog = function (log) {
  * For example, a .jade file will trigger us to require('jade') and use that.
  * There are two ways to override:
  *  - When chug.compiler[fileType] === false, the content will not be compiled.
- *  - When typeof chug.compiler[fileType] === 'string', we will require(chug.compiler[fileType]).
+ *  - When typeof chug.compiler[fileType] == 'string', we will require(chug.compiler[fileType]).
  */
 chug._compilers = {
   txt: false,
@@ -137,7 +134,7 @@ chug._targetLanguages = {
  * Filters are used for passing loads through other modules.
  */
 chug._filters = {
-  pack: require(__dirname + '/lib/pack')
+  pack: require('./lib/pack')
 }
 
 /**
@@ -162,14 +159,9 @@ chug.setMinifier = function (language, moduleName) {
 /**
  * Enable the shrinker.
  */
-chug.enableShrinking = function() {
-  chug.shrinker = require(__dirname + '/lib/shrinker')
-  chug.cache.each(function (asset) {
+chug.enableShrinking = function () {
+  chug.shrinker = require('./lib/shrinker')
+  chug.cache.forEach(function (asset) {
     asset.minify()
   })
 }
-
-// Load dependencies later because many of them depend on chug.
-chug.Asset = require(__dirname + '/lib/asset')
-chug.File = require(__dirname + '/lib/file')
-var Load = chug.Load = require(__dirname + '/lib/load')

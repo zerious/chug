@@ -10,7 +10,7 @@
 
 var fs = require('fs')
 var mkdirp = require('../../common/fs/mkdirp')
-var Type = require('../../common/object/type')
+var Type = require('lighter-type')
 var dirname = require('path').dirname
 
 /**
@@ -72,9 +72,7 @@ var DotCache = module.exports = Type.extend({
         })
       }
     })
-
   }
-
 })
 
 // Make a base cacher with default options.

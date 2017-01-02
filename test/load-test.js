@@ -1,11 +1,12 @@
+/* global describe before after it */
+
 var fs = require('fs')
 var http = require('http')
 var zlib = require('zlib')
 var chug = require('../chug')
 var Asset = require('../lib/asset')
-var exec = require('child_process').exec
 var cwd = process.cwd()
-var is = global.is || require('exam/lib/is')
+var is = global.is || require('exam-is')
 
 var express, server
 chug.enableShrinking()
@@ -32,7 +33,6 @@ var mockStat = function (path, callback) {
 }
 
 describe('Load', function () {
-
   before(function () {
     express = require('express')()
     server = express.listen(8999)
@@ -48,7 +48,7 @@ describe('Load', function () {
 
   it('should load nothing if no path is passed', function () {
     var empty = chug()
-    is(empty.assets.length, 0)
+    is.undefined(empty.children)
   })
 
   it('should load views', function (done) {
@@ -59,7 +59,7 @@ describe('Load', function () {
 
       // Pollute Object so we'll touch hasOwnProperty code paths.
       Object.prototype.polluted = true
-      chug.cache.each(function () {
+      chug.cache.forEach(function () {
         hasCachedItems = true
       })
       delete Object.prototype.polluted
@@ -99,7 +99,7 @@ describe('Load', function () {
     chug(path)
   })
 
-  it('should skip . and .. "files"', function() {
+  it('should skip . and .. "files"', function () {
     var readdir = fs.readdir
     fs.readdir = function (dir, callback) {
       callback(null, ['.', '..', 'mock.txt'])
@@ -112,7 +112,7 @@ describe('Load', function () {
     fs.stat = stat
   })
 
-  it('should log an error when a directory can\'t be read', function() {
+  it('should log an error when a directory can\'t be read', function () {
     var readdir = fs.readdir
     fs.readdir = function (dir, callback) {
       callback('ERROR')
@@ -159,7 +159,7 @@ describe('Load', function () {
   })
 
   it('should cull content', function (done) {
-    chug.cache.clear()
+    chug.cache.reset()
     chug('test/views/hello.ltl').cull().compile().each(function (h) {
       is(h.cullTarget, 'content')
       done()
@@ -167,7 +167,7 @@ describe('Load', function () {
   })
 
   it('should cull compiled content', function (done) {
-    chug.cache.clear()
+    chug.cache.reset()
     chug('test/scripts/a.coffee').compile().cull().each(function (a) {
       is(a.cullTarget, 'compiledContent')
       done()
@@ -201,6 +201,7 @@ describe('Load', function () {
       .concat()
       .then(function () {
         var first = scripts.assets[0]
+        debug(scripts.assets.length, first.content)
         is(first.content.split('=').length, 4)
         done()
       })
@@ -437,7 +438,7 @@ describe('Load', function () {
       .then(function () {
         var joined = this.getLocations().join(',')
         is(joined, cwd + '/mock/a.js,' + cwd + '/mock/b.js,' + cwd + '/mock/c.js')
-        chug.cache.clear()
+        chug.cache.reset()
         chug('test/mock').sort().concat().each(function (asset) {
           is(asset.content, 'var a = 1;\nvar b = 2;\nvar c = 3;\n')
           fs.readdir = readdir

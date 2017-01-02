@@ -1,6 +1,8 @@
+/* global describe it */
+
 var chug = require('../chug')
 var File = require('../lib/file')
-var is = global.is || require('exam/lib/is')
+var is = global.is || require('exam-is')
 
 describe('File', function () {
   var file = new File('test/file-test.js')
@@ -9,7 +11,7 @@ describe('File', function () {
   })
   it('should load content', function (done) {
     file.then(function () {
-      is.string(file.content)
+      is.instanceOf(file.content, Buffer)
       is.true(file.content.length > 0)
       done()
     })

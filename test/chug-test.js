@@ -1,5 +1,7 @@
+/* global describe before it */
+
 var chug = require('../chug')
-var is = global.is || require('exam/lib/is')
+var is = global.is || require('exam-is')
 
 describe('API', function () {
   before(function () {
@@ -9,13 +11,6 @@ describe('API', function () {
   })
   it('should be a function', function () {
     is.function(chug)
-  })
-  describe('version', function () {
-    var packageVersion = require('../package.json').version
-    it('should be ' + packageVersion, function () {
-      var chugVersion = chug.version
-      is(chugVersion, packageVersion)
-    })
   })
   describe('setCompiler', function () {
     it('should be a function', function () {
