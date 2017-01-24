@@ -5,7 +5,7 @@
   "dependencies": {
     "csso": "2.3.0",
     "lighter-crc32": "1.0.0",
-    "lighter-flagger": "1.1.0",
+    "lighter-flagger": "^1.2.1",
     "lighter-lru-cache": "1.0.0",
     "lighter-mime": "1.0.0",
     "lighter-type": "2.2.1",
@@ -17,7 +17,7 @@
     "short-sass": "2.1.1",
     "clean-css": "3.4.23",
     "coffee-script": "1.12.2",
-    "exam": "1.4.5",
+    "exam": "^1.4.5",
     "express": "4.14.0",
     "less": "2.7.1",
     "ltl": "0.3.1",
@@ -47,7 +47,6 @@
     "test": "./node_modules/exam/exam.js",
     "cover": "./node_modules/exam/exam-cover.js",
     "report": "open coverage/lcov-report/index.html",
-    "coveralls": "./node_modules/exam/exam-coveralls.js",
     "bench": "./node_modules/exam/exam.js test/bench"
   },
   "repository": "https://github.com/lighterio/chug.git",
@@ -57,5 +56,5 @@
   "contributors": [
     "Sam Eubank <sameubank@gmail.com>"
   ],
-  "license": "ISC"
+  "license": "MIT"
 }

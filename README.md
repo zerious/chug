@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/npm/v/chug.svg)](//www.npmjs.com/package/chug)
 [![Downloads](https://img.shields.io/npm/dm/chug.svg)](//www.npmjs.com/package/chug)
 [![Build](https://img.shields.io/travis/lighterio/chug.svg)](//travis-ci.org/lighterio/chug)
-[![Coverage](https://img.shields.io/coveralls/lighterio/chug/master.svg)](//coveralls.io/r/lighterio/chug)
+[![Coverage](https://img.shields.io/codecov/c/github/lighterio/chug/master.svg)](//codecov.io/gh/lighterio/chug)
 [![Style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](//www.npmjs.com/package/standard)
 
 
