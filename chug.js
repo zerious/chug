@@ -98,7 +98,15 @@ chug.setCompiler = function (fileExtension, moduleName) {
   try {
     compiler = require(moduleName)
   } catch (e) {
-    chug.log.error('[Chug] Could not load compiler: ' + moduleName)
+    try {
+      compiler = require('../' + moduleName)
+    } catch (e) {
+      try {
+        compiler = require(process.cwd() + '/' + moduleName)
+      } catch (e) {
+        chug.log.error('[Chug] Could not load compiler: ' + moduleName)
+      }
+    }
   }
   chug._compilers[fileExtension] = compiler
   return compiler
