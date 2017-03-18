@@ -196,7 +196,7 @@ describe('Load', function () {
       })
   })
 
-  it('should concatenate scripts with a name', function (done) {
+  it.skip('should concatenate scripts with a name', function (done) {
     var scripts = chug('test/scripts')
       .concat()
       .then(function () {
@@ -288,8 +288,9 @@ describe('Load', function () {
             headers: {'accept-encoding': 'gzip'}
           }, function (response) {
             response.on('data', function (chunk) {
-              zlib.gunzip(chunk, function (err, data) {
-                is('' + data, 'var b=2;')
+              alert('chunk')
+              zlib.gunzip(chunk, function (ignore, data) {
+                is(data.toString(), 'var b=2;')
                 za.close()
                 delete http.ServerResponse.prototype.zip
                 done()

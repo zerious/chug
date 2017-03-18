@@ -173,3 +173,34 @@ chug.enableShrinking = function () {
     asset.minify()
   })
 }
+
+/**
+ * Route static files.
+ */
+chug.routes = new Cache()
+
+/**
+ * Expose a static file server middleware.
+ */
+chug.middleware = function (request, response, next) {
+  var parts = request.url.split('?')
+  var url = parts[0]
+  var item = chug.routes.get(url)
+  if (!item) {
+    return next()
+  }
+  var query = parts[1]
+  var content = item.content
+  response.statusCode = 200
+  response.setHeader('Content-Type', item.mime)
+  if (query) {
+    var future = new Date(Date.now() + 1e11)
+    response.setHeader('Expires', future.toUTCString())
+  }
+  if (typeof content === 'function') {
+    var cache = content.cache
+    var state = response.state
+    content = content.call(cache, state, state)
+  }
+  response.end(content)
+}

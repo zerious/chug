@@ -1,14 +1,14 @@
 {
   "name": "chug",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "The caching build system.",
   "dependencies": {
     "csso": "2.3.0",
-    "lighter-crc32": "1.0.0",
+    "lighter-crc32": "^1.0.0",
     "lighter-flagger": "^1.2.1",
-    "lighter-lru-cache": "1.0.0",
-    "lighter-mime": "1.0.0",
-    "lighter-type": "2.2.1",
+    "lighter-lru-cache": "^1.0.0",
+    "lighter-mime": "^1.0.0",
+    "lighter-type": "^2.2.1",
     "uglify-js": "2.7.5"
   },
   "devDependencies": {
@@ -27,17 +27,23 @@
     "za": "0.3.3"
   },
   "keywords": [
+    "asset",
+    "build",
+    "building",
     "cache",
     "caching",
-    "build",
+    "load",
+    "loader",
+    "route",
+    "router",
+    "tool",
+    "grunt",
+    "gulp",
+    "connect",
     "lightweight",
     "fast",
     "simple",
-    "load",
-    "build",
-    "loader",
-    "route",
-    "router"
+    "easy"
   ],
   "main": "chug.js",
   "engines": {
